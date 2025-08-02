@@ -3,17 +3,16 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { services } from '@/data/vendorService';
+// import { services } from '@/data/vendorService';
 import { VendorService } from '@/types/index';
+import { Link, usePage } from '@inertiajs/react';
 import { BarChartIcon, BookmarkIcon, CalendarIcon, DollarSignIcon, GlobeIcon, ServerIcon, StarIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
 import { useState } from 'react';
 
 const servicesPerPage = 6;
 
 export default function VendorServiceGrid() {
-    const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = Math.ceil(services.length / servicesPerPage);
-    const paginatedServices = services.slice((currentPage - 1) * servicesPerPage, currentPage * servicesPerPage);
+      const { services } = usePage().props;
 
     const getDaysAgo = (dateString: string) => {
         const postDate = new Date(dateString);
@@ -57,7 +56,7 @@ export default function VendorServiceGrid() {
     return (
         <>
             <div className="grid grid-cols-1 gap-6 px-4 sm:grid-cols-2 lg:grid-cols-3">
-                {paginatedServices.map((service) => {
+                {services.map((service) => {
                     const highlight = getHighlightDetails(service.highlight);
 
                     return (
@@ -95,10 +94,7 @@ export default function VendorServiceGrid() {
 
                             <CardContent className="flex flex-grow flex-col gap-3">
                                 <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <ServerIcon className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-sm capitalize">{service.serviceType.replace('-', ' ')}</span>
-                                    </div>
+                                
                                     <div className="flex items-center gap-2">
                                         <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm">{service.price}</span>
@@ -113,7 +109,7 @@ export default function VendorServiceGrid() {
 
                                 <div className="mt-auto">
                                     <p className="mb-1.5 text-xs font-medium text-muted-foreground">Features:</p>
-                                    <div className="flex flex-wrap gap-1.5">
+                                    {/* <div className="flex flex-wrap gap-1.5">
                                         {service.features.slice(0, 3).map((feature, index) => (
                                             <Badge variant="secondary" key={index} className="text-xs">
                                                 {feature}
@@ -124,7 +120,7 @@ export default function VendorServiceGrid() {
                                                 +{service.features.length - 3} more
                                             </Badge>
                                         )}
-                                    </div>
+                                    </div> */}
                                 </div>
                             </CardContent>
 
@@ -143,20 +139,18 @@ export default function VendorServiceGrid() {
             </div>
 
             <div className="mt-10 flex items-center justify-center gap-4">
-                <Button variant="outline" size="sm" disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}>
-                    Previous
-                </Button>
-                <span className="text-sm text-muted-foreground">
-                    Page {currentPage} of {totalPages}
-                </span>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
-                >
-                    Next
-                </Button>
+                    <div className="mt-4 flex space-x-2">
+        {services.links.map((link, index) => (
+          <Link
+            key={index}
+            href={link.url || ''}
+            className={`px-3 py-1 border rounded ${
+              link.active ? 'bg-blue-600 text-white' : 'bg-gray-200'
+            }`}
+            dangerouslySetInnerHTML={{ __html: link.label }}
+          />
+        ))}
+      </div>  
             </div>
         </>
     );
